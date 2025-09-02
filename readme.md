@@ -165,6 +165,14 @@ The MCP Server provides the following tools to interact with your Directus insta
 | **update-field**     | Modify existing fields                               | Changing field configuration, interface options                |
 | **read-flows**       | List available automation flows                      | Finding automation opportunities                               |
 | **trigger-flow**     | Execute automation flows                             | Bulk operations, publishing, status changes                    |
+| **read-permissions** | List all permission rules                            | Viewing access controls, auditing permissions                  |
+| **read-permission**  | Get specific permission rule                         | Detailed permission inspection                                 |
+| **create-permission**| Create a permission rule                             | Setting up access controls for collections                     |
+| **create-permissions**| Create multiple permission rules                    | Bulk permission setup for new roles/policies                   |
+| **update-permission**| Update a permission rule                             | Modifying access controls                                      |
+| **update-permissions**| Update multiple permission rules                    | Bulk permission changes                                        |
+| **delete-permission**| Delete a permission rule                             | Removing access controls                                       |
+| **delete-permissions**| Delete multiple permission rules                    | Bulk permission removal                                        |
 | **read-comments**    | View comments on items                               | Retrieving feedback, viewing discussion threads                |
 | **upsert-comment**   | Add or update comments                               | Providing feedback, documenting decisions                      |
 | **markdown-tool**    | Convert between markdown and HTML                    | Content formatting for WYSIWYG fields                          |
@@ -202,39 +210,110 @@ Both system prompts and message content support mustache templating using the `{
 2. When calling a prompt, provide values for the variables in the `arguments` parameter
 3. The MCP server will automatically replace all variables with their provided values
 
-## Local / Dev Installation
+## Local / Dev Installation (Using Your Fork)
 
-1. Clone the repo
-2. `pnpm install && pnpm build` to build the server
-3. Configure Claude Desktop or Cursor like above, but pointing it to the `dist` file instead:
-4. Use `pnpm dev` to watch for changes and rebuild the server
+If you've forked or cloned this repository and made custom modifications (like the new permissions tools), follow these instructions to use your local version instead of the published NPM package.
+
+### Prerequisites
+1. Clone your forked repo: `git clone https://github.com/YOUR_USERNAME/directus-mcp.git`
+2. Navigate to the directory: `cd directus-mcp`
+3. Install dependencies: `pnpm install`
+4. Build the project: `pnpm build`
+5. Note the full path to your built file: `/path/to/your/directus-mcp/dist/index.js`
+
+### Claude Desktop (Local Version)
+
+1. Open Claude Desktop and navigate to Settings
+2. Under the Developer tab, click Edit Config
+3. Add the following configuration (replace paths with your actual paths):
 
 ```json
 {
 	"mcpServers": {
 		"directus": {
 			"command": "node",
-			"args": ["/path/to/directus-mcp-server/dist/index.js"]
+			"args": ["/Users/YOUR_USERNAME/path/to/directus-mcp/dist/index.js"],
+			"env": {
+				"DIRECTUS_URL": "https://your-directus-url.com",
+				"DIRECTUS_TOKEN": "your-directus-token"
+			}
 		}
 	}
 }
 ```
 
-Sample Claude Desktop Config for local dev with full settings
+4. Save and restart Claude Desktop
+
+### Cursor (Local Version)
+
+1. Create a `.cursor` directory in your project root if it doesn't exist
+2. Create a `.cursor/mcp.json` file with:
 
 ```json
 {
 	"mcpServers": {
 		"directus": {
 			"command": "node",
-			"args": [
-				"/path/to/directus-mcp-server/dist/index.js"
-			],
+			"args": ["/Users/YOUR_USERNAME/path/to/directus-mcp/dist/index.js"],
 			"env": {
-				"DIRECTUS_URL": "DIRECTUS_URL",
-				"DIRECTUS_TOKEN": "DIRECTUS_TOKEN",
+				"DIRECTUS_URL": "https://your-directus-url.com",
+				"DIRECTUS_TOKEN": "your-directus-token"
+			}
+		}
+	}
+}
+```
+
+3. Save the file and restart Cursor
+4. Check Settings → MCP to verify the connection
+
+### Raycast (Local Version)
+
+1. Open Raycast and search for "MCP Servers"
+2. Select "Install Server" from the MCP Servers menu
+3. Use this configuration:
+
+```json
+{
+	"mcpServers": {
+		"directus": {
+			"command": "node",
+			"args": ["/Users/YOUR_USERNAME/path/to/directus-mcp/dist/index.js"],
+			"env": {
+				"DIRECTUS_URL": "https://your-directus-url.com",
+				"DIRECTUS_TOKEN": "your-directus-token"
+			}
+		}
+	}
+}
+```
+
+4. Press Command+Enter to install
+
+### Development Mode (Auto-rebuild)
+
+For active development with auto-rebuild on file changes:
+
+1. In your directus-mcp directory, run: `pnpm dev`
+2. This will watch for changes and automatically rebuild
+3. Your MCP clients will use the latest built version (you may need to restart them after changes)
+
+### Example: Full Local Dev Configuration
+
+Here's a complete example with all options for Claude Desktop using a local build:
+
+```json
+{
+	"mcpServers": {
+		"directus": {
+			"command": "node",
+			"args": ["/Users/cdslipp/Code/open source/directus/directus-mcp/dist/index.js"],
+			"env": {
+				"DIRECTUS_URL": "https://your-directus-instance.com",
+				"DIRECTUS_TOKEN": "your_directus_token",
+				"DISABLE_TOOLS": [],
 				"MCP_SYSTEM_PROMPT_ENABLED": "true",
-				"MCP_SYSTEM_PROMPT": "You're a content editor working at Directus.\nYou're a master at copywriting and creating messaging that resonates with technical audiences.\nYou'll be given details about a Directus instance and the schema within it. You'll be asked to update content and other helpful tasks. **Rules** \n - If you're updating HTML / WYSWIG fields inside the CMS - DO NOT ADD extra styling, classes, or markup outside the standard HTML elements. If you're not 95% sure what values should go into a certain field, stop and ask the user. Before deleting anything, confirm with the user and prompt them for an explicit DELETE confirmation via text.",
+				"MCP_SYSTEM_PROMPT": "You're a content editor working at Directus.\nYou're a master at copywriting and creating messaging that resonates with technical audiences.",
 				"DIRECTUS_PROMPTS_COLLECTION_ENABLED": "true",
 				"DIRECTUS_PROMPTS_COLLECTION": "ai_prompts"
 			}
@@ -242,6 +321,13 @@ Sample Claude Desktop Config for local dev with full settings
 	}
 }
 ```
+
+### Troubleshooting Local Installation
+
+- **"Command not found" error**: Make sure you're using the full absolute path to `dist/index.js`
+- **Changes not reflecting**: After rebuilding (`pnpm build`), restart your MCP client
+- **Permission errors**: Ensure the dist/index.js file has execute permissions: `chmod +x dist/index.js`
+- **Module not found errors**: Make sure you've run `pnpm install` and `pnpm build` successfully
 
 ### Example Configurations
 

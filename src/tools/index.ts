@@ -24,6 +24,16 @@ import {
 	updateItemTool,
 } from './items.js';
 import { markdownTool } from './markdown.js';
+import {
+	createPermissionTool,
+	createPermissionsTool,
+	deletePermissionTool,
+	deletePermissionsTool,
+	readPermissionTool,
+	readPermissionsTool,
+	updatePermissionTool,
+	updatePermissionsTool,
+} from './permissions.js';
 import { createSystemPrompt } from './prompts.js';
 import schemaTool from './schema.js';
 import { readUsersTool, usersMeTool } from './users.js';
@@ -53,6 +63,15 @@ export const getTools = (config: Config) => {
 		readFieldTool,
 		createFieldTool,
 		updateFieldTool,
+		// Permissions
+		readPermissionsTool,
+		readPermissionTool,
+		createPermissionTool,
+		createPermissionsTool,
+		updatePermissionTool,
+		updatePermissionsTool,
+		deletePermissionTool,
+		deletePermissionsTool,
 		// Comments
 		readCommentsTool,
 		upsertCommentTool,

@@ -8,7 +8,7 @@ import {
 } from '../utils/response.js';
 
 export const readFlowsTool = defineTool('read-flows', {
-	description: 'Fetch manually triggerable flows from Directus. Flows allow users to automate tasks inside Directus.',
+	description: 'Fetch all flows from Directus. Flows allow users to automate tasks inside Directus.',
 	annotations: {
 		title: 'Read Flows',
 		readOnlyHint: true,
@@ -17,14 +17,7 @@ export const readFlowsTool = defineTool('read-flows', {
 	handler: async (directus, _query) => {
 		try {
 			const result = await directus.request(
-				readFlows({
-					filter: {
-						trigger: {
-							// @ts-expect-error - _prefixed operators not working
-							_eq: 'manual',
-						},
-					},
-				}),
+				readFlows(),
 			);
 
 			return formatSuccessResponse(result);
